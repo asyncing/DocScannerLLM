@@ -23,7 +23,7 @@ if shutil.which("ollama") is None:
     print("Ollama is not installed. Initiating setup to install Ollama....")
     if os_name=="Windows":
         installer_path="OllamaSetup.exe"
-        urllib.request.urlretrieve("https://ollama.com/downloads/OllamaSetup.exe", installer_path)
+        urllib.request.urlretrieve("https://ollama.com/download/OllamaSetup.exe", installer_path)
         os.startfile(installer_path)
     elif os_name=="Darwin":
         print("Opening the official Ollama Mac download page...")
