@@ -10,6 +10,46 @@ import whisper
 import time
 import torch
 import cpuinfo
+import shutil
+import platform
+import webbrowser
+import subprocess
+import urllib.request
+from urllib.error import URLError
+
+
+if shutil.which("ollama") is None:
+    os_name=platform.system()
+    print("Ollama is not installed. Initiating setup to install Ollama....")
+    if os_name=="Windows":
+        installer_path="OllamaSetup.exe"
+        urllib.request.urlretrieve("https://ollama.com/downloads/OllamaSetup.exe", installer_path)
+        os.startfile(installer_path)
+    elif os_name=="Darwin":
+        print("Opening the official Ollama Mac download page...")
+        webbrowser.open("https://ollama.com/download/Ollama.dmg")
+    elif os_name=="Linux":
+        print("Running official Ollama install script for Linux")
+        subprocess.run("curl -fsSL https://ollama.com/install.sh | sh", shell=True)
+    print("Please complete the Ollama setup, then run this script again.")
+def ollama_status_check():
+    try:
+        urllib.request.urlopen("http://localhost:11434/", timeout=2)
+        return True
+    except URLError:
+        return False
+if not ollama_status_check():
+    print("Starting Ollama background service...")
+    subprocess.Popen(
+        ["ollama", "serve"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+    time.sleep(5)
+
+
+
+LLM="dolphin-llama3:latest"
 
 cpu_name=cpuinfo.get_cpu_info()["brand_raw"]
 device="cpu"
@@ -51,8 +91,8 @@ filetypes=[
     ]
 )
 if not file_path:
-    time.sleep(5)
     print("No file selected. Exiting...")
+    time.sleep(5)
     exit()
 
 def extraction(file_path):
@@ -121,7 +161,7 @@ print("\nGenerating summary...\n")
 
 
 result = ollama.generate(
-    model='dolphin-llama3:latest',
+    model=LLM,
     prompt=prompt,
     stream=False
 )
