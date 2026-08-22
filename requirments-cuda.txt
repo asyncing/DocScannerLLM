@@ -9,3 +9,4 @@ pymupdf==1.28.2
 python_docx==1.2.0
 torch==2.13.0+cu126
 tabulate
+streamlit==1.54.0

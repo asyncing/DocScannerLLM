@@ -1,10 +1,11 @@
 beautifulsoup4==4.15.0
 ollama==0.6.2
 openai_whisper==20250625
-openpyxl==3.1.5
 pandas==3.0.5
 py_cpuinfo==9.0.0
 pymupdf==1.28.2
 python_docx==1.2.0
-torch==2.13.0
+streamlit==1.54.0
+streamlit==1.62.0
+torch==2.13.0+cu126
 tabulate
