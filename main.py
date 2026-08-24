@@ -18,20 +18,22 @@ import urllib.request
 from urllib.error import URLError
 
 
-if shutil.which("ollama") is None:
-    os_name=platform.system()
-    print("Ollama is not installed. Initiating setup to install Ollama....")
-    if os_name=="Windows":
-        installer_path="OllamaSetup.exe"
-        urllib.request.urlretrieve("https://ollama.com/download/OllamaSetup.exe", installer_path)
-        os.startfile(installer_path)
-    elif os_name=="Darwin":
-        print("Opening the official Ollama Mac download page...")
-        webbrowser.open("https://ollama.com/download/Ollama.dmg")
-    elif os_name=="Linux":
-        print("Running official Ollama install script for Linux")
-        subprocess.run("curl -fsSL https://ollama.com/install.sh | sh", shell=True)
-    print("Please complete the Ollama setup, then run this script again.")
+def check_os():
+    if shutil.which("ollama") is None:
+        os_name=platform.system()
+        print("Ollama is not installed. Initiating setup to install Ollama....")
+        if os_name=="Windows":
+            installer_path="OllamaSetup.exe"
+            urllib.request.urlretrieve("https://ollama.com/download/OllamaSetup.exe", installer_path)
+            os.startfile(installer_path)
+        elif os_name=="Darwin":
+            print("Opening the official Ollama Mac download page...")
+            webbrowser.open("https://ollama.com/download/Ollama.dmg")
+        elif os_name=="Linux":
+            print("Running official Ollama install script for Linux")
+            subprocess.run("curl -fsSL https://ollama.com/install.sh | sh", shell=True)
+        print("Please complete the Ollama setup, then run this script again.")
+check_os()
 def ollama_status_check():
     try:
         urllib.request.urlopen("http://localhost:11434/", timeout=2)
@@ -46,6 +48,7 @@ if not ollama_status_check():
         stderr=subprocess.DEVNULL
     )
     time.sleep(5)
+ollama_status_check()
 
 
 
@@ -135,36 +138,38 @@ def extraction(file_path):
         time.sleep(5)
         exit()
     return text
-document_text=extraction(file_path)
 
 
-prompt = f"""You are an expert, objective multimedia analyst. Your task is to provide a clear, comprehensive, and structured description and summary of the provided text, audio, or video file.
+def ollama_run():
+    document_text = extraction(file_path)
 
-Regardless of whether the file is a factual document, a technical manual, a fictional narrative, or an audio/video recording, you must strictly adhere to the following rules:
+    prompt = f"""You are an expert, objective multimedia analyst. Your task is to provide a clear, comprehensive, and structured description and summary of the provided text, audio, or video file.
 
-1. Maintain an objective tone: Use a strict third-person perspective. Do NOT use first- or second-person pronouns (e.g., do not use "I", "me", "you", or "your") when describing the content.
+    Regardless of whether the file is a factual document, a technical manual, a fictional narrative, or an audio/video recording, you must strictly adhere to the following rules:
 
-2. Transcribe and describe all media elements: For audio and video files, exhaustively describe everything seen and heard. You must explicitly detail visual scenes, camera movements, on-screen actions, visible text, spoken dialogue, speaker changes, tone of voice, background noises, and sound effects.
+    1. Maintain an objective tone: Use a strict third-person perspective. Do NOT use first- or second-person pronouns (e.g., do not use "I", "me", "you", or "your") when describing the content.
 
-3. Identify the core thesis: Define the core subject, overarching plot, or main thesis of the document or media file.
+    2. Transcribe and describe all media elements: For audio and video files, exhaustively describe everything seen and heard. You must explicitly detail visual scenes, camera movements, on-screen actions, visible text, spoken dialogue, speaker changes, tone of voice, background noises, and sound effects.
 
-4. Provide a structured chronological outline: Outline the most important points, narrative phases, visual sequences, or arguments using concise bullet points. If analyzing audio/video, present this breakdown chronologically.
+    3. Identify the core thesis: Define the core subject, overarching plot, or main thesis of the document or media file.
 
-5. Remain neutral: Do not judge, censor, or editorialize the content. Extract, describe, and summarize the information exactly as it is presented in the source material.
+    4. Provide a structured chronological outline: Outline the most important points, narrative phases, visual sequences, or arguments using concise bullet points. If analyzing audio/video, present this breakdown chronologically.
 
-Document Text:
-{document_text}
+    5. Remain neutral: Do not judge, censor, or editorialize the content. Extract, describe, and summarize the information exactly as it is presented in the source material.
 
-Summary:"""
+    Document Text:
+    {document_text}
 
-print("\nGenerating summary...\n")
+    Summary:"""
 
+    print("\nGenerating summary...\n")
 
-result = ollama.generate(
-    model=LLM,
-    prompt=prompt,
-    stream=False
-)
+    result = ollama.generate(
+        model=LLM,
+        prompt=prompt,
+        stream=False
+    )
 
-print(result["response"])
-print("\n")
+    print(result["response"])
+    print("\n")
+ollama_run()
