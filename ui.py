@@ -1,12 +1,28 @@
 import streamlit as st
-st.set_page_config(page_title="DocScannerLLM", page_icon="✡")
-st.title("Test Code")
-st.write("Checking Browser")
-st.divider()
-st.header("Interactive")
-user=st.text_input("Enter gibberish")
-slider_val=st.slider("Check Slider", 1, 1000, 69)
-st.header("Buttons")
-if st.button("Click here"):
-    st.snow()
-    st.success("Test Complete")
+import tempfile
+import os
+from main import ollama_run, check_os, ollama_status_check
+st.title("DocScannerLLM")
+st.write("Upload a document, audio, or video file to get the summary")
+uploaded_file = st.file_uploader(
+    "Choose a file",
+type=[
+        "txt", "pdf", "docx", "xlsx", "csv", "html",
+        "mp3", "wav", "flac", "m4a", "aac", "ogg", "wma", "alac", "aiff", "amr", "opus",
+        "mp4", "avi", "mkv", "mov", "webm", "wmv", "flv", "m4v", "mpeg", "mpg", "3gp", "ts", "vob"
+    ]
+)
+if uploaded_file is not None:
+    if st.button("Generate Summary"):
+        with st.spinner("Transcribing Media"):
+            file_extension=os.path.splitext(uploaded_file.name)[1]
+            with tempfile.NamedTemporaryFile(delete=False, suffix=file_extension) as temp_file:
+                temp_file.write(uploaded_file.getvalue())
+                temp_file_path=temp_file.name
+            try:
+                summary=ollama_run(temp_file_path)
+                st.subheader("Result")
+                st.write(summary)
+            finally:
+                if os.path.exists(temp_file_path):
+                    os.remove(temp_file_path)

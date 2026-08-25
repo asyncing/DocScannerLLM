@@ -16,6 +16,7 @@ import webbrowser
 import subprocess
 import urllib.request
 from urllib.error import URLError
+import socket
 
 
 def check_os():
@@ -38,7 +39,7 @@ def ollama_status_check():
     try:
         urllib.request.urlopen("http://localhost:11434/", timeout=2)
         return True
-    except URLError:
+    except (URLError, socket.timeout,TimeoutError):
         return False
 if not ollama_status_check():
     print("Starting Ollama background service...")
@@ -80,23 +81,7 @@ if torch.cuda.is_available():
 else:
     print(f"No CUDA GPU detected. Running on CPU({cpu_name}) in FP32")
 
-root=tk.Tk()
-root.withdraw()
-file_path=filedialog.askopenfilename(
-    title="Select a text file to scan",
-filetypes=[
-        ("All Supported", "*.txt *.pdf *.docx *.xlsx *.csv *.html *.mp3 *.wav *.flac *.m4a *.aac *.ogg *.wma *.alac *.aiff *.amr *.opus *.mp4 *.avi *.mkv *.mov *.webm *.wmv *.flv *.m4v *.mpeg *.mpg *.3gp *.ts *.vob"),
-        ("Documents", "*.pdf *.docx *.txt"),
-        ("Spreadsheets", "*.xlsx *.csv"),
-        ("Audio Files", "*.mp3 *.wav *.flac *.m4a *.aac *.ogg *.wma *.alac *.aiff *.amr *.opus"),
-        ("Video Files", "*.mp4 *.avi *.mkv *.mov *.webm *.wmv *.flv *.m4v *.mpeg *.mpg *.3gp *.ts *.vob"),
-        ("All Files", "*.*")
-    ]
-)
-if not file_path:
-    print("No file selected. Exiting...")
-    time.sleep(5)
-    exit()
+
 
 def extraction(file_path):
     _, extension=os.path.splitext(file_path) #_ is throwaway var
@@ -140,7 +125,7 @@ def extraction(file_path):
     return text
 
 
-def ollama_run():
+def ollama_run(file_path):
     document_text = extraction(file_path)
 
     prompt = f"""You are an expert, objective multimedia analyst. Your task is to provide a clear, comprehensive, and structured description and summary of the provided text, audio, or video file.
@@ -162,7 +147,7 @@ def ollama_run():
 
     Summary:"""
 
-    print("\nGenerating summary...\n")
+
 
     result = ollama.generate(
         model=LLM,
@@ -170,6 +155,5 @@ def ollama_run():
         stream=False
     )
 
-    print(result["response"])
-    print("\n")
-ollama_run()
+    return result["response"]
+
