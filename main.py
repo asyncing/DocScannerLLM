@@ -1,7 +1,5 @@
 import ollama
 import os
-import tkinter as tk
-from tkinter import filedialog
 import docx
 import pymupdf as pdf
 import pandas as pd
