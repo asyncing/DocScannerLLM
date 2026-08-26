@@ -53,31 +53,39 @@ ollama_status_check()
 
 LLM="dolphin-llama3:latest"
 
-cpu_name=cpuinfo.get_cpu_info()["brand_raw"]
-device="cpu"
-use_fp16=False
-nvidia_map={1: "Tesla",
-            2: "Fermi",
-            3: "Kepler",
-            5: "Maxwell",
-            6: "Pascal",
-            7: "Turing/Volta",
-            8: "Ampere/Ada",
-            9: "Hopper",
-            10: "Blackwell"}
-if torch.cuda.is_available():
-    device="cuda"
-    gpu_name=torch.cuda.get_device_name(0)
-    compute_major=torch.cuda.get_device_capability()[0]
-    arch_name=nvidia_map.get(compute_major, "Unknown Architecture")
-    if compute_major >=7:
-        use_fp16=True
-        print(f"CPU- [{cpu_name}] detected, GPU- [{gpu_name}] detected, Architecture: {arch_name}. Using FP16")
-    else:
-        use_fp16=False
-        print(f"CPU- [{cpu_name}] detected, GPU- [{gpu_name}] detected. Architecture: {arch_name}. Falling back to FP32")
-else:
-    print(f"No CUDA GPU detected. Running on CPU({cpu_name}) in FP32")
+def get_system_specs():
+    cpu_name = cpuinfo.get_cpu_info()["brand_raw"]
+    device = "cpu"
+    use_fp16 = False
+    gpu_name = "None"
+    arch_name = "N/A"
+
+    nvidia_map = {
+        1: "Tesla", 2: "Fermi", 3: "Kepler", 5: "Maxwell",
+        6: "Pascal", 7: "Turing/Volta", 8: "Ampere/Ada", 9: "Hopper", 10: "Blackwell"
+    }
+
+    if torch.cuda.is_available():
+        device = "cuda"
+        gpu_name = torch.cuda.get_device_name(0)
+        compute_major = torch.cuda.get_device_capability()[0]
+        arch_name = nvidia_map.get(compute_major, "Unknown Architecture")
+        use_fp16 = compute_major >= 7
+
+    return {
+        "CPU": cpu_name,
+        "GPU": gpu_name,
+        "Architecture": arch_name,
+        "Device": device,
+        "Precision": "FP16" if use_fp16 else "FP32",
+        "Ollama Status": "Running" if ollama_status_check() else "Offline"
+    }
+
+
+
+specs = get_system_specs()
+device = specs["Device"]
+use_fp16 = specs["Precision"] == "FP16"
 
 
 
