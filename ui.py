@@ -30,6 +30,8 @@ if uploaded_file is not None:
                 temp_file.write(uploaded_file.getvalue())
                 temp_file_path=temp_file.name
             try:
+
+                st.write(f"Running extraction with `{specs['Precision']}` on `{specs['Device']}`...")
                 summary=ollama_run(temp_file_path)
                 st.subheader("Result")
                 st.write(summary)
