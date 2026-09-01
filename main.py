@@ -134,32 +134,43 @@ def extraction(file_path):
 def ollama_run(file_path):
     document_text = extraction(file_path)
 
-    prompt = f"""You are an expert, objective multimedia analyst. Your task is to provide a clear, comprehensive, and structured description and summary of the provided text, audio, or video file.
 
-    Regardless of whether the file is a factual document, a technical manual, a fictional narrative, or an audio/video recording, you must strictly adhere to the following rules:
+    if not document_text or not document_text.strip():
+        return "Extraction Error: No text could be extracted from the file. If this is a scanned PDF/image, OCR is required."
 
-    1. Maintain an objective tone: Use a strict third-person perspective. Do NOT use first- or second-person pronouns (e.g., do not use "I", "me", "you", or "your") when describing the content.
-
-    2. Transcribe and describe all media elements: For audio and video files, exhaustively describe everything seen and heard. You must explicitly detail visual scenes, camera movements, on-screen actions, visible text, spoken dialogue, speaker changes, tone of voice, background noises, and sound effects.
-
-    3. Identify the core thesis: Define the core subject, overarching plot, or main thesis of the document or media file.
-
-    4. Provide a structured chronological outline: Outline the most important points, narrative phases, visual sequences, or arguments using concise bullet points. If analyzing audio/video, present this breakdown chronologically.
-
-    5. Remain neutral: Do not judge, censor, or editorialize the content. Extract, describe, and summarize the information exactly as it is presented in the source material.
-
-    Document Text:
-    {document_text}
-
-    Summary:"""
-
-
-
-    result = ollama.generate(
-        model=LLM,
-        prompt=prompt,
-        stream=False
+    system_instruction = (
+        "You are an objective document and media analyst. "
+        "Analyze ONLY the provided source material. "
+        "Never use first-person ('I', 'me', 'my') or second-person ('you', 'your') pronouns. "
+        "Never state your model identity, name, or persona. "
+        "Provide zero conversational filler or greetings. "
+        "Output strictly following the required headers."
     )
 
-    return result["response"]
+    user_content = f"""Analyze the source material enclosed within the <source_material> tags.
+
+Required Output Structure:
+**Core Thesis / Subject**
+(1-3 sentence objective summary of the core thesis, allegations, or main subject)
+
+**Chronological Breakdown & Key Details**
+* (Bullet points detailing key events, facts, visual/audio details, or timeline in sequential order)
+
+<source_material>
+{document_text}
+</source_material>"""
+
+    response = ollama.chat(
+        model=LLM,
+        messages=[
+            {"role": "system", "content": system_instruction},
+            {"role": "user", "content": user_content}
+        ],
+        options={
+            "temperature": 0.1,
+            "top_p": 0.9
+        }
+    )
+
+    return response["message"]["content"]
 
