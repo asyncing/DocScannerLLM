@@ -10,3 +10,4 @@ python_docx==1.2.0
 torch==2.13.0+cu126
 tabulate
 streamlit==1.62.0
+
