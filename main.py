@@ -65,16 +65,19 @@ def get_system_specs():
         6: "Pascal", 7: "Turing/Volta", 8: "Ampere/Ada", 9: "Hopper", 10: "Blackwell"
     }
 
+    vram_gb=0
     if torch.cuda.is_available():
         device = "cuda"
         gpu_name = torch.cuda.get_device_name(0)
         compute_major = torch.cuda.get_device_capability()[0]
         arch_name = nvidia_map.get(compute_major, "Unknown Architecture")
         use_fp16 = compute_major >= 7
+        vram_gb=round(torch.cuda.get_device_properties(0).total_memory/(1024**3), 1)
 
     return {
         "CPU": cpu_name,
         "GPU": gpu_name,
+        "VRAM_GB": vram_gb,
         "Architecture": arch_name,
         "Device": device,
         "Precision": "FP16" if use_fp16 else "FP32",
@@ -89,7 +92,7 @@ use_fp16 = specs["Precision"] == "FP16"
 
 
 
-def extraction(file_path):
+def extraction(file_path, whisper_size):
     _, extension=os.path.splitext(file_path) #_ is throwaway var
     ext_low=extension.lower()
     text=""
@@ -120,18 +123,27 @@ def extraction(file_path):
         ".m4v", ".mpeg", ".mpg", ".3gp", ".ts", ".vob"
     ]:
 
-        print("Transcribing Media...")
-        model_size="medium" if use_fp16 else "base"
-        model=whisper.load_model(model_size).to(device)
+        print(f"Transcribing Media using Whisper {whisper_size}...")
+        model=whisper.load_model(whisper_size).to(device)
         text=model.transcribe(file_path, fp16=use_fp16)["text"]
     else:
         print(f"Unsupported file type: {ext_low}")
         time.sleep(5)
         exit()
     return text
+def check_ollama_model(model_name):
+    try:
+        res=ollama.list()
+        installed=[m.model for m in res.models] if hasattr(res, "models") else [m["name"] for m in res.get("models", [])]
+    except Exception:
+        installed=[]
+    if model_name not in installed:
+        print(f"Downloading {model_name}...")
+        ollama.pull(model_name)
 
 
-def ollama_run(file_path):
+def ollama_run(file_path, llm_name, whisper_size):
+    check_ollama_model(llm_name)
     document_text = extraction(file_path)
 
 
@@ -161,7 +173,7 @@ Required Output Structure:
 </source_material>"""
 
     response = ollama.chat(
-        model=LLM,
+        model=llm_name,
         messages=[
             {"role": "system", "content": system_instruction},
             {"role": "user", "content": user_content}
