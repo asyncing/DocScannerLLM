@@ -144,7 +144,7 @@ def check_ollama_model(model_name):
 
 def ollama_run(file_path, llm_name, whisper_size):
     check_ollama_model(llm_name)
-    document_text = extraction(file_path)
+    document_text = extraction(file_path, whisper_size)
 
 
     if not document_text or not document_text.strip():
