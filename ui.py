@@ -18,80 +18,79 @@ st.set_page_config(page_title="Multimedia Analyzer", layout="wide")
 
 st.markdown("""
 <style>
+/* Clean, snappy enter animation */
 @keyframes fadeSlideIn {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(15px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
 div[data-testid="stAppViewBlockContainer"] {
-    animation: fadeSlideIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    animation: fadeSlideIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
+/* Modern, minimalist typography */
 h1 {
-    background: -webkit-linear-gradient(45deg, #4f46e5, #ec4899);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-weight: 700 !important;
+    letter-spacing: -0.5px !important;
 }
 
+/* Sleek SaaS-style Button (Professional Blue) */
 .stButton > button {
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    border-radius: 12px !important;
-    background: linear-gradient(-45deg, #4f46e5, #9333ea, #4f46e5, #ec4899) !important;
-    background-size: 300% 300% !important;
-    color: white !important;
-    border: none !important;
-    padding: 0.6rem 1.2rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.5px;
+    transition: all 0.2s ease-in-out !important;
+    border-radius: 6px !important;
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    border: 1px solid #2563eb !important;
+    padding: 0.5rem 1.2rem !important;
+    font-weight: 600 !important;
 }
 
 .stButton > button:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 12px 24px -10px rgba(147, 51, 234, 0.7) !important;
-    animation: gradientBG 3s ease infinite !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+    background-color: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
 }
 
+/* Subtle, polished file uploader */
 div[data-testid="stFileUploader"] {
-    transition: all 0.3s ease-in-out;
-    border-radius: 16px;
-    padding: 5px;
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    border: 1px dashed rgba(100, 116, 139, 0.4);
+    background-color: transparent;
 }
 
 div[data-testid="stFileUploader"]:hover {
-    transform: scale(1.02);
+    border-color: #2563eb;
+    background-color: rgba(37, 99, 235, 0.02);
 }
 
+/* Refined interactive elements */
 div[data-testid="stExpander"] {
-    transition: all 0.3s ease;
-    border-radius: 12px !important;
+    transition: all 0.2s ease;
+    border-radius: 8px !important;
 }
 
 div[data-testid="stExpander"]:hover {
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .stToggle {
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .stToggle:hover {
-    transform: translateX(8px);
+    transform: translateX(4px);
 }
 
 div[data-testid="stAlert"] {
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    border-radius: 8px;
 }
 
 div[data-testid="stAlert"]:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 </style>
 """, unsafe_allow_html=True)
