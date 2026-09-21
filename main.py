@@ -155,7 +155,7 @@ def ollama_run(file_path, llm_name, whisper_size):
         "Analyze ONLY the provided source material. "
         "Never use first-person ('I', 'me', 'my') or second-person ('you', 'your') pronouns. "
         "Never state your model identity, name, or persona. "
-        "Provide zero conversational filler or greetings. "
+        "Provide zero conversational filler(including anything sexual, political, violent or otherwise controversial) or greetings. "
         "Output strictly following the required headers."
     )
 
